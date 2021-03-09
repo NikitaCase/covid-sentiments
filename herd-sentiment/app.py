@@ -6,12 +6,13 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from config import db_address
+#from config import db_address
 
 # ------------------------------------------------------------------------------
 # Create an engine for the database
 # ------------------------------------------------------------------------------
-engine = create_engine(db_address, echo=False)
+#engine = create_engine(db_address, echo=False)
+engine = create_engine('sqlite:///trial.sqlite')
 
 
 # Reflect Database into ORM classes
@@ -19,103 +20,98 @@ engine = create_engine(db_address, echo=False)
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
-# ------------------------------------------------------------------------------
-# Flask Setup
-# ------------------------------------------------------------------------------
-app = Flask(__name__)
+print(Base.classes.keys())
+
+# # ------------------------------------------------------------------------------
+# # Flask Setup
+# # ------------------------------------------------------------------------------
+# app = Flask(__name__)
 
 
-# Frontend Route and Homepage
-# ------------------------------------------------------------------------------
-@app.route("/")
-def home():
-    return render_template("index.html")
+# # Frontend Route and Homepage
+# # ------------------------------------------------------------------------------
+# @app.route("/")
+# def home():
+#     return render_template("index.html")
 
 
-# Backend Routes:
-# Entertainment page
-# ------------------------------------------------------------------------------
-@app.route('/entertainment')
-def entertainment():
+# # Backend Routes:
+# # Timeline
+# # ------------------------------------------------------------------------------
 
-    stocks = Base.classes.entertainment
-    session = Session(engine)
+# # for some reason doesnt work in flask but works in jupyter 
+# @app.route('/timeline')
+# def timeline():
 
-    gc = session.query(stocks.Ticker, stocks.Adj_Close, stocks.Date).filter(
-        stocks.Ticker == 'GC.TO').order_by(stocks.Date).all()
-    recp = session.query(stocks.Ticker, stocks.Adj_Close, stocks.Date).filter(
-        stocks.Ticker == 'RECP.TO').order_by(stocks.Date).all()
-    cgx = session.query(stocks.Ticker, stocks.Adj_Close, stocks.Date).filter(
-        stocks.Ticker == 'CGX.TO').order_by(stocks.Date).all()
+#     airlines = Base.classes.airlines
+#     session = Session(engine)
+    
+#     lines = session.query(airlines.id_str, airlines.date, airlines.Sentiment, airlines.Polarity, airlines.retweet_count).all()
 
-    entertainment_stocks = {"entertainment_stocks": [
-        {
-            'Ticker': 'GC.TO',
-            'Date': [row[2] for row in gc],
-            'Adj_Close': [row[1] for row in gc]
-        },
-        {
-            'Ticker': 'RECP.TO',
-            'Date': [row[2] for row in recp],
-            'Adj_Close': [row[1] for row in recp]
-        },
-        {
-            'Ticker': 'CGX.TO',
-            'Date': [row[2] for row in cgx],
-            'Adj_Close': [row[1] for row in cgx]
-        }
-    ]}
-    session.close()
-    return jsonify(entertainment_stocks)
+#     id_str = [col[0] for col in lines]
+#     date = [col[1] for col in lines]
+#     sentiment = [col[2] for col in lines]
+#     polarity = [col[3] for col in lines]
+#     retweet_count = [col[4] for col in lines]
+#     #favourite_count = [col[5] for col in lines]
 
-# Telecommunication page
-# ------------------------------------------------------------------------------
-@app.route('/telecommunication')
-def telecommunication():
+#     lined = {'timeline':[{
+#         'id_str': id_str, 
+#         'date': date, 
+#         'sentiment': sentiment,
+#         'polarity': polarity,
+#         'retweet_count': retweet_count  
+#     }]}
 
-    stocks = Base.classes.telecommunication
-    session = Session(engine)
+#     session.close()
+#     return jsonify(lined)
 
-    rci = session.query(stocks.Ticker, stocks.Adj_Close, stocks.Date).filter(
-        stocks.Ticker == 'RCI-B.TO').order_by(stocks.Date).all()
-    bce = session.query(stocks.Ticker, stocks.Adj_Close, stocks.Date).filter(
-        stocks.Ticker == 'BCE.TO').order_by(stocks.Date).all()
 
-    telecommunication_stocks = {"telecommunication_stocks": [
-        {
-            'Ticker': 'RCI-B.TO',
-            'Date': [row[2] for row in rci],
-            'Adj_Close': [row[1] for row in rci]
-        },
-        {
-            'Ticker': 'BCE.TO',
-            'Date': [row[2] for row in bce],
-            'Adj_Close': [row[1] for row in bce]
-        }
-    ]}
-    session.close()
-    return jsonify(telecommunication_stocks)
+# # Timeline
+# # ------------------------------------------------------------------------------
+# @app.route('/map')
+# def map():
 
-# Dates page
-# --------------------------------------------------------------------------------
-@app.route('/dates')
-def dates():
+#     airlines = Base.classes.airlines
+#     session = Session(engine)
+    
+#     lines = session.query(airlines.id_str, airlines.latitude, airlines.longitude, airlines.Sentiment).all()
 
-    stocks = Base.classes.dates_table
-    session = Session(engine)
+#     loc =[]
+#     for col in lines:
+#         lo = {
+#             'id_str': [col[0] for col in lines], 
+#             'latitude': [col[1] for col in lines], 
+#             'longitude': [col[2] for col in lines],
+#             'sentiment': [col[3] for col in lines] 
+#             }
+#         loc.append(lo)
 
-    news = session.query(stocks.Date, stocks.News).all()
+#     session.close()
+#     return jsonify(loc)
+ 
 
-    date_dict = {"Story": [{
-        'Date': [row[0] for row in news],
-        'News': [row[1] for row in news]
-    }]}
+    
+# # Dates page
+# # --------------------------------------------------------------------------------
+# # @app.route('/dates')
+# # def dates():
 
-    session.close()
-    return jsonify(date_dict)
+# #     stocks = Base.classes.dates_table
+# #     session = Session(engine)
+
+# #     news = session.query(stocks.Date, stocks.News).all()
+
+# #     date_dict = {"Story": [{
+# #         'Date': [row[0] for row in news],
+# #         'News': [row[1] for row in news]
+# #     }]}
+
+# #     session.close()
+# #     return jsonify(date_dict)
 
 
  
 
-if __name__ == "__main__":
-    app.run()
+# if __name__ == "__main__":
+#     app.run()
